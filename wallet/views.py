@@ -1,11 +1,13 @@
+from datetime import timedelta
 from decimal import Decimal
 from http import HTTPStatus
 
+from django.utils import timezone
 from rest_framework import generics
 from rest_framework.response import Response
 
 from wallet import serializers
-from wallet.models import Transaction, Wallet
+from wallet.models import Transaction, Wallet, LockedAmount
 
 
 class CustomGenericAPIView(generics.GenericAPIView):
@@ -22,12 +24,21 @@ class DepositAPIView(CustomGenericAPIView):
 
         username: str = self.get_username_from_header(request)
 
+        amount: Decimal = serializer.validated_data.pop('amount', Decimal(0.0))
+        lock_time: int = serializer.validated_data.pop('lock_time', 0)
+
         wallet: Wallet
         wallet, _ = Wallet.objects.get_or_create(username=username)
 
         Transaction.objects.create(
             wallet_id=wallet.pk,
-            amount=serializer.validated_data.pop('amount', Decimal(0.0))
+            amount=amount
+        )
+
+        LockedAmount.objects.create(
+            wallet_id=wallet.pk,
+            amount=amount,
+            unlock_at=timezone.now() + timedelta(seconds=lock_time)
         )
 
         return Response({}, status=HTTPStatus.OK)

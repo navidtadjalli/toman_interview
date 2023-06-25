@@ -103,5 +103,7 @@ class DepositAPITestCase(CustomAPITestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        self.assertTrue(self.wallet.transactions.exists())
+        self.assertTrue(self.wallet.locked_amounts.exists())
         self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
+
+
