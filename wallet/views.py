@@ -42,3 +42,15 @@ class DepositAPIView(CustomGenericAPIView):
         )
 
         return Response({}, status=HTTPStatus.OK)
+
+
+class WithdrawAPIView(CustomGenericAPIView):
+    serializer_class = serializers.WithdrawSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username: str = self.get_username_from_header(request)
+
+        return Response({}, status=HTTPStatus.OK)
