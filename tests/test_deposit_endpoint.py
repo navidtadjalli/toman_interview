@@ -1,7 +1,9 @@
+from datetime import timedelta
 from decimal import Decimal
 from http import HTTPStatus
 
 from django.urls import reverse
+from django.utils import timezone
 
 from tests.custom_api_test_case import CustomAPITestCase
 from wallet.models import Wallet
@@ -96,14 +98,5 @@ class DepositAPITestCase(CustomAPITestCase):
 
         self.assertTrue(self.wallet.transactions.exists())
         self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
-
-    def test_deposit_affects_lock_time(self):
-        response = self.call_endpoint_with_post(self.url,
-                                                data={"amount": "9.9", "lock_time": 1})
-
-        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
-
-        self.assertTrue(self.wallet.locked_amounts.exists())
-        self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
-
-
+        diff: timedelta = self.wallet.transactions.get().available_at - timezone.now()
+        self.assertTrue(0 < diff.total_seconds() < 1)

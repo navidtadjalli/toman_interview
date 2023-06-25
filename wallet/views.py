@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from wallet import serializers
-from wallet.models import Transaction, Wallet, LockedAmount
+from wallet.models import Transaction, Wallet
 
 
 class CustomGenericAPIView(generics.GenericAPIView):
@@ -33,13 +33,8 @@ class DepositAPIView(CustomGenericAPIView):
 
         Transaction.objects.create(
             wallet_id=wallet.pk,
-            amount=amount
-        )
-
-        LockedAmount.objects.create(
-            wallet_id=wallet.pk,
             amount=amount,
-            unlock_at=timezone.now() + timedelta(seconds=lock_time)
+            available_at=timezone.now() + timedelta(seconds=lock_time)
         )
 
         return Response(status=HTTPStatus.NO_CONTENT)
