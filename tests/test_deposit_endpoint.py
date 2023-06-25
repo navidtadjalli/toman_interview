@@ -22,3 +22,64 @@ class DepositAPITestCase(CustomAPITestCase):
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertIn("amount", response.data)
         self.assertIn("lock_time", response.data)
+
+    def test_deposit_response_status_is_200_if_input_is_correct(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": 123})
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_deposit_validates_amount_field_is_number(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "amount", "lock_time": 123})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("amount", response.data)
+
+    def test_deposit_validates_amount_field_maximum_digits(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "999999999999999", "lock_time": 123})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("amount", response.data)
+
+    def test_deposit_validates_amount_field_maximum_decimal_digits(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.999", "lock_time": 123})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("amount", response.data)
+
+    def test_deposit_validates_amount_field_is_more_than_zero(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "-9.9", "lock_time": 123})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("amount", response.data)
+
+    def test_deposit_validates_lock_time_field_is_number(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": "lock_time"})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("lock_time", response.data)
+
+    def test_deposit_validates_lock_time_field_is_more_than_equal_zero(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": -1})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("lock_time", response.data)
+
+    def test_deposit_accepts_lock_time_being_zero(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": 0})
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_deposit_validates_lock_time_field_does_not_accepts_float(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": 0.5})
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("lock_time", response.data)
