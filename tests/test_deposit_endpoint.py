@@ -1,13 +1,17 @@
+from decimal import Decimal
 from http import HTTPStatus
 
 from django.urls import reverse
 
 from tests.custom_api_test_case import CustomAPITestCase
+from wallet.models import Wallet
 
 
 class DepositAPITestCase(CustomAPITestCase):
     def setUp(self):
         self.url = reverse("deposit")
+
+        self.wallet = Wallet.objects.create(username=self.DEFAULT_USERNAME)
 
     def test_if_deposit_endpoint_exists(self):
         self.assertNotEqual(self.call_endpoint_with_get(self.url).status_code, HTTPStatus.NOT_FOUND)
@@ -83,3 +87,21 @@ class DepositAPITestCase(CustomAPITestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertIn("lock_time", response.data)
+
+    def test_deposit_inserts_a_transaction(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": 1})
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        self.assertTrue(self.wallet.transactions.exists())
+        self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
+
+    def test_deposit_affects_lock_time(self):
+        response = self.call_endpoint_with_post(self.url,
+                                                data={"amount": "9.9", "lock_time": 1})
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        self.assertTrue(self.wallet.transactions.exists())
+        self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))

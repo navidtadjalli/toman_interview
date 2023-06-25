@@ -21,7 +21,7 @@ class TransactionModelTestCase(TestCase):
             amount="123.12"
         )
 
-        self.assertEqual(str(transaction), f"Transaction for {wallet.username} wallet at {transaction.created_at}")
+        self.assertEqual(str(transaction), f"Transaction for test wallet at {transaction.created_at}")
 
     def test_for_negative_amount(self):
         wallet: Wallet = Wallet.objects.create(username="test")
@@ -30,4 +30,4 @@ class TransactionModelTestCase(TestCase):
             amount="-123.12"
         )
 
-        self.assertEqual(str(transaction), f"Transaction for {wallet.username} wallet at {transaction.created_at}")
+        self.assertEqual(str(transaction), f"Transaction for test wallet at {transaction.created_at}")

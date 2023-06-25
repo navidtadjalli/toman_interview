@@ -9,6 +9,8 @@ class CustomAPITestCase(APITestCase):
     GET_METHOD_TYPE: str = "GET"
     POST_METHOD_TYPE: str = "POST"
 
+    DEFAULT_USERNAME = "username"
+
     def call_endpoint(self, url: str, method: str, data: Optional[dict] = None, headers: Optional[dict] = None):
         callable_method: Callable = self.client.get
 
@@ -28,7 +30,7 @@ class CustomAPITestCase(APITestCase):
         if not headers:
             headers = {}
 
-        headers["X_USERNAME"] = "username"
+        headers["X_USERNAME"] = self.DEFAULT_USERNAME
         callable_arguments["headers"] = headers
 
 
