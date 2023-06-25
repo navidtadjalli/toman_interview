@@ -8,6 +8,7 @@ class Wallet(models.Model):
         verbose_name=_("Username"),
         max_length=24,
         db_index=True,
+        unique=True,
         null=False,
         blank=False
     )
@@ -45,6 +46,7 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = _("Transaction")
         verbose_name_plural = _("Transactions")
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Transaction for {self.wallet} wallet at {self.created_at}"

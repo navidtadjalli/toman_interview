@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from wallet.models import Wallet
 
