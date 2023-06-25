@@ -31,7 +31,7 @@ class DepositAPITestCase(CustomAPITestCase):
         response = self.call_endpoint_with_post(self.url,
                                                 data={"amount": "9.9", "lock_time": 123})
 
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
 
     def test_deposit_validates_amount_field_is_number(self):
         response = self.call_endpoint_with_post(self.url,
@@ -79,7 +79,7 @@ class DepositAPITestCase(CustomAPITestCase):
         response = self.call_endpoint_with_post(self.url,
                                                 data={"amount": "9.9", "lock_time": 0})
 
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
 
     def test_deposit_validates_lock_time_field_does_not_accepts_float(self):
         response = self.call_endpoint_with_post(self.url,
@@ -92,7 +92,7 @@ class DepositAPITestCase(CustomAPITestCase):
         response = self.call_endpoint_with_post(self.url,
                                                 data={"amount": "9.9", "lock_time": 1})
 
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
 
         self.assertTrue(self.wallet.transactions.exists())
         self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
@@ -101,7 +101,7 @@ class DepositAPITestCase(CustomAPITestCase):
         response = self.call_endpoint_with_post(self.url,
                                                 data={"amount": "9.9", "lock_time": 1})
 
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
 
         self.assertTrue(self.wallet.locked_amounts.exists())
         self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))

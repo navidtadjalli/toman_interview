@@ -12,6 +12,7 @@ class WalletModelTestCase(TestCase):
 
         self.assertTrue(hasattr(wallet, "username"))
         self.assertTrue(hasattr(wallet, "transactions"))
+        self.assertTrue(hasattr(wallet, "balance"))
 
     def test_str_function(self):
         wallet: Wallet = Wallet(

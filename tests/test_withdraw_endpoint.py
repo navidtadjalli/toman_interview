@@ -26,12 +26,6 @@ class WithdrawAPITestCase(CustomAPITestCase):
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertIn("amount", response.data)
 
-    def test_withdraw_response_status_is_200_if_input_is_correct(self):
-        response = self.call_endpoint_with_post(self.url,
-                                                data={"amount": "9.9"})
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
     def test_withdraw_validates_amount_field_is_number(self):
         response = self.call_endpoint_with_post(self.url,
                                                 data={"amount": "amount"})
@@ -59,7 +53,17 @@ class WithdrawAPITestCase(CustomAPITestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertIn("amount", response.data)
-
+    #
+    # def test_withdraw_checks_wallet_balance(self):
+    #     response = self.call_endpoint_with_post(self.url,
+    #                                             data={"amount": "9.9"})
+    #
+    #     self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+    #     self.assertEqual(response.data, "InsufficientBalance")
+    #
+    #     self.assertTrue(self.wallet.locked_amounts.exists())
+    #     self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
+    # #
     # def test_withdraw_inserts_a_transaction(self):
     #     response = self.call_endpoint_with_post(self.url,
     #                                             data={"amount": "9.9", "lock_time": 1})
@@ -69,13 +73,11 @@ class WithdrawAPITestCase(CustomAPITestCase):
     #     self.assertTrue(self.wallet.transactions.exists())
     #     self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
     #
-    # def test_withdraw_checks_locked_amount(self):
+    # def test_withdraw_inserts_a_transaction(self):
     #     response = self.call_endpoint_with_post(self.url,
     #                                             data={"amount": "9.9", "lock_time": 1})
     #
     #     self.assertEqual(response.status_code, HTTPStatus.OK)
     #
-    #     self.assertTrue(self.wallet.locked_amounts.exists())
+    #     self.assertTrue(self.wallet.transactions.exists())
     #     self.assertEqual(self.wallet.transactions.get().amount, Decimal("9.9"))
-
-
