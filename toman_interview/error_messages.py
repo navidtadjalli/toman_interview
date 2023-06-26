@@ -7,4 +7,4 @@ def get_error_dict(msg: str) -> dict:
     }
 
 
-INSUFFICIENT_BALANCE_ERROR_MESSAGE = get_error_dict(_("Issufficient balance."))
+INSUFFICIENT_BALANCE_ERROR_MESSAGE = get_error_dict(_("Insufficient balance."))
