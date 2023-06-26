@@ -29,6 +29,7 @@ class Wallet(models.Model):
     def deposit(self,
                 amount: Decimal,
                 lock_time: int):
+        # TODO lock table to prevent withdrawal
         self.transactions.create(
             amount=amount,
             available_at=timezone.now() + timedelta(seconds=lock_time)
@@ -36,6 +37,7 @@ class Wallet(models.Model):
 
     def withdraw(self,
                  amount: Decimal):
+        # TODO lock table to prevent racing condition
         self.transactions.create(
             amount=amount * -1,
             available_at=timezone.now()
