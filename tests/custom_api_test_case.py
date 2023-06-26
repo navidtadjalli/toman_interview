@@ -33,7 +33,6 @@ class CustomAPITestCase(APITestCase):
         headers["X_USERNAME"] = self.DEFAULT_USERNAME
         callable_arguments["headers"] = headers
 
-
         return callable_method(**callable_arguments)
 
     def call_endpoint_with_get(self, url: str, data: Optional[dict] = None, headers: Optional[dict] = None):
