@@ -45,3 +45,6 @@ Run docker image with following command
 ```
 docker run -p 8000:8000 -t interview_project
 ```
+
+### TODO list
+- add swagger for endpoints
