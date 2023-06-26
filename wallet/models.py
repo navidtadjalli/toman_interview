@@ -1,4 +1,8 @@
+from datetime import timedelta
+from decimal import Decimal
+
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from django.utils.translation import gettext_lazy as _
@@ -15,8 +19,27 @@ class Wallet(models.Model):
     )
 
     @property
-    def balance(self):
-        return self.transactions.prefetch_related
+    def balance(self) -> Decimal:
+        return Wallet.objects.aggregate(
+            balance=Coalesce(models.Sum("transactions__amount",
+                                        filter=models.Q(transactions__available_at__lte=timezone.now())),
+                             Decimal("0.0"))
+        )["balance"]
+
+    def deposit(self,
+                amount: Decimal,
+                lock_time: int):
+        self.transactions.create(
+            amount=amount,
+            available_at=timezone.now() + timedelta(seconds=lock_time)
+        )
+
+    def withdraw(self,
+                 amount: Decimal):
+        self.transactions.create(
+            amount=amount * -1,
+            available_at=timezone.now()
+        )
 
     class Meta:
         verbose_name = _("Wallet")
@@ -57,7 +80,7 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = _("Transaction")
         verbose_name_plural = _("Transactions")
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
     def __str__(self):
         return f"Transaction for {self.wallet} wallet at {self.created_at}"
