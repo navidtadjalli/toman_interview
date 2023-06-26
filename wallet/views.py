@@ -1,14 +1,12 @@
-from datetime import timedelta
 from decimal import Decimal
 from http import HTTPStatus
 
-from django.utils import timezone
 from rest_framework import generics
 from rest_framework.response import Response
 
 from toman_interview import error_messages
 from wallet import serializers
-from wallet.models import Transaction, Wallet
+from wallet.models import Wallet
 
 
 class CustomGenericAPIView(generics.GenericAPIView):
