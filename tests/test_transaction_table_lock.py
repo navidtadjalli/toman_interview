@@ -9,7 +9,7 @@ from django.test import TransactionTestCase
 from django.urls import reverse
 
 from tests.custom_api_test_case import CustomAPITestCase
-from wallet.models import Wallet
+from wallet.models import Wallet, LockedAtomicTransaction, Transaction
 
 
 class TransactionLockTestCase(TransactionTestCase):
@@ -79,3 +79,4 @@ class TransactionLockTestCase(TransactionTestCase):
         self.assertGreaterEqual(wallet_balance, Decimal(0))
         self.assertEqual(wallet_balance, Decimal(0))
         self.assertEqual(len(list(filter(lambda x: x == HTTPStatus.NO_CONTENT, withdrawal_statuses))), 2)
+        self.assertEqual(len(list(filter(lambda x: x == HTTPStatus.BAD_REQUEST, withdrawal_statuses))), 3)

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from toman_interview import error_messages
 from wallet import serializers
-from wallet.models import Wallet
+from wallet.models import Wallet, LockedAtomicTransaction, Transaction
 
 
 class CustomGenericAPIView(generics.GenericAPIView):
@@ -25,15 +25,16 @@ class DepositAPIView(CustomGenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        amount: Decimal = serializer.validated_data.pop('amount', Decimal(0.0))
-        lock_time: int = serializer.validated_data.pop('lock_time', 0)
+        with LockedAtomicTransaction(Transaction):
+            amount: Decimal = serializer.validated_data.pop('amount', Decimal(0.0))
+            lock_time: int = serializer.validated_data.pop('lock_time', 0)
 
-        self.get_wallet(request).deposit(
-            amount=amount,
-            lock_time=lock_time
-        )
+            self.get_wallet(request).deposit(
+                amount=amount,
+                lock_time=lock_time
+            )
 
-        return Response(status=HTTPStatus.NO_CONTENT)
+            return Response(status=HTTPStatus.NO_CONTENT)
 
 
 class WithdrawAPIView(CustomGenericAPIView):
@@ -43,15 +44,16 @@ class WithdrawAPIView(CustomGenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        amount: Decimal = serializer.validated_data.pop('amount', Decimal(0.0))
+        with LockedAtomicTransaction(Transaction):
+            amount: Decimal = serializer.validated_data.pop('amount', Decimal(0.0))
 
-        wallet: Wallet = self.get_wallet(request)
+            wallet: Wallet = self.get_wallet(request)
 
-        if amount > wallet.balance:
-            return Response(error_messages.INSUFFICIENT_BALANCE_ERROR_MESSAGE, status=HTTPStatus.BAD_REQUEST)
+            if amount > wallet.balance:
+                return Response(error_messages.INSUFFICIENT_BALANCE_ERROR_MESSAGE, status=HTTPStatus.BAD_REQUEST)
 
-        wallet.withdraw(
-            amount=amount
-        )
+            wallet.withdraw(
+                amount=amount
+            )
 
-        return Response(status=HTTPStatus.NO_CONTENT)
+            return Response(status=HTTPStatus.NO_CONTENT)
